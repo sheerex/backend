@@ -9,7 +9,7 @@ export async function checkAdmin (req, res, next) {
 
     return next()
   
-  } catch (err) {
+  } catch (error) {
     return res.status(error?.status || 500).json({ message: error?.message || error})
   }
 }
@@ -19,7 +19,7 @@ export function checkUser (req, res, next) {
     getToken(req)
     return next()
 
-  } catch (err) {
+  } catch (error) {
     return res.status(error?.status || 500).json({ message: error?.message || error})
   }    
 }
@@ -37,7 +37,7 @@ export function getToken (req) {
         throw {status:401, message: "Invalid Token"}
       }     
 
-  } catch (err) {
+  } catch (error) {
     throw {status: error?.status || 500, message: error?.message || error}
   }
 }
