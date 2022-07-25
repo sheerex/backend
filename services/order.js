@@ -28,6 +28,8 @@ export async function getOrder(id, queryObject) {
       where: {id: id, ...filterObject}, 
       order: sortingArray
     })
+    if (!order)
+      throw {status: 404, message:  "Order Does Not Exist."} 
     return order
   } catch (error) {
     throw {status: 500, message: error.message}

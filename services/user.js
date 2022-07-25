@@ -27,6 +27,8 @@ export async function getUser(id, includeBalance, queryObject) {
       where: {id: id, ...filterObject}, 
       order: sortingArray
     })
+    if (!user)
+      throw {status: 404, message:  "User Does Not Exist."} 
     return user
   } catch (error) {
     throw {status: 500, message: error.message}
@@ -116,14 +118,13 @@ export async function login(loginUser) {
 
     checkNotEmpty(loginUser, ["email", "password"], true)
 
-    const user = await User.findOne({where: {email: loginUser.email}})
+    const user = await User.findOne({attributes: ["id", "active", "password", "verified"], where: {email: loginUser.email}})
     if (!user || !(await bcrypt.compare(loginUser.password, user.password)))
       throw {status: 401, message: "Invalid Credentials."}
     if (!user.verified)
       throw {status: 401, message: "User Not Verified."}
     if (!user.active)
       throw {status: 401, message: "User Not Active."}
-
     const token = jwt.sign(
       { id: user.id },
       process.env.TOKEN_KEY,

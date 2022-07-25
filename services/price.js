@@ -25,6 +25,8 @@ export async function getPrice(id, queryObject) {
       where: {id, ...filterObject}, 
       order: sortingArray
     })
+    if (!price)
+      throw {status: 404, message:  "Price Does Not Exist."}    
     return price
   } catch (error) {
     throw {status: 500, message: error.message}
@@ -37,6 +39,8 @@ export async function getPriceByCurrencies(currencyId, currency2Id) {
       include: ["currency", "currency2"], 
       where: {currencyId, currency2Id}
     })
+    if (!price)
+      throw {status: 404, message:  "Price Does Not Exist."}    
     return price
   } catch (error) {
     throw {status: 500, message: error.message}

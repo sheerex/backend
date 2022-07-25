@@ -17,6 +17,8 @@ export async function getCurrency(id, queryObject) {
   try {
     const { filterObject, sortingArray } = parseQueryParams(queryObject)
     const currency = await Currency.findOne({where: {id: id, ...filterObject}, order: sortingArray})
+    if (!currency)
+      throw {status: 404, message:  "Currency Does Not Exist."}
     return currency
   } catch (error) {
     throw {status: 500, message: error.message}

@@ -17,12 +17,13 @@ export async function getBalances(queryObject) {
 
 export async function getUserBalances(userId, queryObject) {
   try {
-    console.log("user");
     const { filterObject, sortingArray } = parseQueryParams(queryObject)
     const balances = await Balance.findAll({
       include: [User, Currency], 
       where: {userId, ...filterObject}, 
       order: sortingArray})
+    if (!balances)
+      throw {status: 404, message:  "Balance Does Not Exist."}
     return balances
   } catch (error) {
     throw {status: 500, message: error.message}
