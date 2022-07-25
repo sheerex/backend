@@ -4,13 +4,14 @@ import * as dotenv from 'dotenv'
 dotenv.config()
 
 const ssl = process.env.DB_SSL === "SI" ? {ssl: {require: true, rejectUnauthorized: false}} : {}
+console.log( process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASS,  process.env.DB_HOST)
 
 export const database = new Sequelize(
   process.env.DB_NAME, 
   process.env.DB_USER, 
   process.env.DB_PASS, 
   {
-    host: "ec2-54-152-28-9.compute-1.amazonaws.com", 
+    host:  process.env.DB_HOST, 
     dialect: 'postgres',
     dialectOptions: ssl
   }
