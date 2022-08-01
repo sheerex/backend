@@ -4,6 +4,7 @@ import { sendEmail } from "../helpers/sendEmail.js"
 import { checkNotDuplicate, checkNotEmpty } from "../helpers/validations.js"
 import { Operations, States, Types } from "../models/enum.js";
 import * as priceService from "../services/price.js"
+import * as userService from "../services/user.js"
 
 
 export async function getOrders(queryObject) {
@@ -48,7 +49,7 @@ export async function createOrder(newOrder) {
         throw {status: 400, message: "Invalid Operation for unregistered user."}
       if (newOrder.type === Types.Limit)  
         throw {status: 400, message: "Invalid Type for unregistered user."}
-      checkNotEmpty(newOrder, ["contact"], true)
+      checkNotEmpty(newOrder, ["contact", "email"], true)
     }
 
     if (newOrder.operation === Operations.Swap) {
@@ -69,20 +70,28 @@ export async function createOrder(newOrder) {
     
     delete newOrder.state
     
-    const order = await Order.create(newOrder)
+    const order = await Order.create(newOrder, {include: [User, "currency", "currency2"]})
 
-    /*
+    const orderCreated = await Order.findOne({
+      include: [User, "currency", "currency2", "operator"], 
+      where: {id: order.dataValues.id}
+    })
+
+    const email = orderCreated.dataValues.user?.email ? 
+                    orderCreated.dataValues.user.email : 
+                    orderCreated.dataValues.email
+
     sendEmail(
-      order.email, 
+      email, 
       "Sheerex: Order Registered", 
-      `Order: ${order.id}
-        Type: ${order.type}
-        Amount: ${amount}
-        Currency
+      `Order: ${orderCreated.dataValues.id}
+       Operation: ${orderCreated.dataValues.operation} ${orderCreated.dataValues.type ? "Type: " + orderCreated.dataValues.type : ""}
+       Amount: ${orderCreated.dataValues.amount}
+       Currency: ${orderCreated.dataValues.currency.name}
+       ${orderCreated.dataValues.currency2?.name ? "Currency To: " + orderCreated.dataValues.currency2.name : ""}
       `)
-    */
 
-    return order
+    return orderCreated
   } catch (error) {
     throw {status: error?.status || 500, message: error.message}
   }

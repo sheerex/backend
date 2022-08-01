@@ -63,8 +63,8 @@ export async function createUser(newUser) {
       user.email, 
       "Sheerex: Verify your Email", 
       `In order to operate as a registered user in our platform, 
-      please verify your email entering the following verification code: 
-      ${verificationCode}`)
+please verify your email entering the following verification code: 
+${verificationCode}`)
 
     delete user.dataValues.password
     delete user.dataValues.verificationCode

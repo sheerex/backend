@@ -62,6 +62,10 @@ export const Order = database.define('orders', {
   contact: {
     type: DataTypes.STRING
   },
+  email: {
+    type: DataTypes.STRING,
+    validate: {isEmail: true}
+  },
   network: {
     type: DataTypes.STRING
   }
