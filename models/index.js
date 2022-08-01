@@ -24,9 +24,11 @@ Price.belongsTo(Currency, { as: "currency2", foreignKey: {name: 'currency2Id', a
 Currency.hasMany(Order, { foreignKey: {allowNull: false }})
 Currency.hasMany(Order, { foreignKey: {name: 'currency2Id' }})
 User.hasMany(Order)
+User.hasMany(Order, {foreignKey: {name: 'operatorId' }})
 Order.belongsTo(Currency, { as: "currency"})
 Order.belongsTo(Currency, { as: "currency2", foreignKey: {name: 'currency2Id'}})
 Order.belongsTo(User)
+Order.belongsTo(User, {as: "operator", foreignKey: {name: 'operatorId' }})
 
 export {
   Balance,

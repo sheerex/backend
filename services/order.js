@@ -8,11 +8,13 @@ import * as priceService from "../services/price.js"
 
 export async function getOrders(queryObject) {
     try {
-      const { filterObject, sortingArray } = parseQueryParams(queryObject)
+      const { filterObject, sortingArray, limit, offset } = parseQueryParams(queryObject)
       const orders = await Order.findAll({
-        include: [User, "currency", "currency2"], 
+        include: [User, "currency", "currency2", "operator"], 
         where: filterObject, 
-        order: sortingArray
+        order: sortingArray,
+        ...limit, 
+        ...offset
       })
       return orders
     } catch (error) {
@@ -24,7 +26,7 @@ export async function getOrder(id, queryObject) {
   try {
     const { filterObject, sortingArray } = parseQueryParams(queryObject)
     const order = await Order.findOne({
-      include: [User, "currency", "currency2"], 
+      include: [User, "currency", "currency2", "operator"], 
       where: {id: id, ...filterObject}, 
       order: sortingArray
     })
@@ -39,7 +41,6 @@ export async function getOrder(id, queryObject) {
 export async function createOrder(newOrder) {
   try {
 
-    // VALIDATIONS
     checkNotEmpty(newOrder, ["operation", "amount", "currencyId"], true)
     checkNotEmpty(newOrder, ["userId"], false)
     if (!newOrder.userId) {
@@ -68,7 +69,6 @@ export async function createOrder(newOrder) {
     
     delete newOrder.state
     
-    // CREATION
     const order = await Order.create(newOrder)
 
     /*

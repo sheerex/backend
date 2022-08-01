@@ -4,13 +4,16 @@ import { Balance, Currency, User } from "../models/index.js"
 import { parseQueryParams } from "../helpers/queryParams.js"
 import { sendEmail } from "../helpers/sendEmail.js"
 import { checkNotDuplicate, checkNotEmpty } from "../helpers/validations.js"
+import { googleVerification } from "../helpers/googleVerification.js"
 
 export async function getUsers(queryObject) {
   try {
-    const { filterObject, sortingArray } = parseQueryParams(queryObject)
+    const { filterObject, sortingArray, limit, offset } = parseQueryParams(queryObject)
     const users = await User.findAll({
       where: filterObject, 
-      order: sortingArray
+      order: sortingArray,
+      ...limit,
+      ...offset
     })
     return users
   } catch (error) {
@@ -56,12 +59,15 @@ export async function createUser(newUser) {
       verificationCode
     })
 
-    // sendEmail(
-    //   user.email, 
-    //   "Sheerex: Verify your Email", 
-    //   `In order to operate as a registered user in our platform, 
-    //   please verify your email by clicking in the following link: 
-    //   ${process.env.BASE_API}users/verified/${verificationCode}`)
+    sendEmail(
+      user.email, 
+      "Sheerex: Verify your Email", 
+      `In order to operate as a registered user in our platform, 
+      please verify your email entering the following verification code: 
+      ${verificationCode}`)
+
+    delete user.dataValues.password
+    delete user.dataValues.verificationCode
 
     return user
   } catch (error) {
@@ -115,11 +121,21 @@ export async function deleteUser(id) {
 
 export async function login(loginUser) {
   try {
+    let email, googleAuthenticated
+    if (loginUser.googleToken) {
+      checkNotEmpty(loginUser, ["googleToken"], true)
+      email = await googleVerification(loginUser.googleToken)
+      googleAuthenticated = true
+    }
+    else {
+      checkNotEmpty(loginUser, ["email", "password"], true)
+      email = loginUser.email
+      googleAuthenticated = false
+    }
 
-    checkNotEmpty(loginUser, ["email", "password"], true)
+    const user = await User.findOne({attributes: ["id", "active", "password", "verified"], where: {email: email}})
 
-    const user = await User.findOne({attributes: ["id", "active", "password", "verified"], where: {email: loginUser.email}})
-    if (!user || !(await bcrypt.compare(loginUser.password, user.password)))
+    if (!user || (!googleAuthenticated && !(await bcrypt.compare(loginUser.password, user.password))))
       throw {status: 401, message: "Invalid Credentials."}
     if (!user.verified)
       throw {status: 401, message: "User Not Verified."}
@@ -143,7 +159,7 @@ export async function changePassword(userPassword) {
   try {
     checkNotEmpty(userPassword, ["id", "newPassword", "oldPassword"], true)
 
-    const user = await User.findByPk(userPassword. id)
+    const user = await User.findByPk(userPassword.id)
     if (!user)
       throw {status: 404, message:  "User Does Not Exist."} 
 
@@ -152,7 +168,7 @@ export async function changePassword(userPassword) {
 
     const encryptedPassword = await bcrypt.hash(userPassword.newPassword, 10)
     user.password = encryptedPassword
-    user.save()
+    await user.save()
 
   } catch (error) {
     throw {status: error?.status || 500, message: error.message}
@@ -170,12 +186,36 @@ export async function verifyEmail(verificationCode) {
 
     user.verificationCode = null
     user.verified = true
-    user.save()
+    await user.save()
 
   } catch (error) {
     throw {status: error?.status || 500, message: error.message}
   }
+}
 
+export async function resendVerificationCode(email) {
+  try {
+    const user = await User.findOne({where: {email: email}})
+    if (!user)
+      throw {status: 404, message:  "User Does Not Exist."}
+    
+    if (user.verified)
+      throw {status: 400, message: "User already registered."}
+
+  const verificationCode = Math.floor(100000 + Math.random() * 900000)
+  user.verificationCode = verificationCode
+  await user.save()
+
+  sendEmail(
+    user.email, 
+    "Sheerex: Verify your Email", 
+    `In order to operate as a registered user in our platform, 
+    please verify your email entering the following verification code: 
+    ${verificationCode}`)
+
+  } catch (error) {
+    throw {status: error?.status || 500, message: error.message}
+  }
 }
 
 export async function isAdmin(id) {

@@ -62,7 +62,7 @@ export async function updateOrder(req, res) {
       const order = await orderService.getOrder(req.params.id)
       await checkUserAccess(order.userId, req.user.id, "User is not Admin and can only Update his own orders.")
 
-      const listFieldsDefine = fieldsDefined(req, ["comments", "contact"])
+      const listFieldsDefine = fieldsDefined(req, ["comments", "contact", "operatorId"])
       if (listFieldsDefine)
         return res.status(403).send({message: `User is not Admin and can not update ${listFieldsDefine}.`})
 
@@ -70,17 +70,25 @@ export async function updateOrder(req, res) {
         if (req.body.state !== States.Canceled)
           return res.status(403).send({message: `User is not Admin and only can Cancel an Order.`})
         if (order.state !== States.Pending) 
-          return res.status(403).send({message: `User is not Admin and only can Cancel an Pending Order.`})
+          return res.status(403).send({message: `User is not Admin and only can Cancel a Pending Order.`})
       }
     }
 
     let updatedOrder = {id: req.params.id}
     if (req.body.state)
       updatedOrder = {...updatedOrder, state: req.body.state}
-      if (req.body.comments)
+    if (req.body.hasOwnProperty("comments"))
       updatedOrder = {...updatedOrder, comments: req.body.comments}
     if (req.body.contact)
       updatedOrder = {...updatedOrder, contact: req.body.contact}
+    if (req.body.hasOwnProperty("operatorId")) {
+      if (req.body.operatorId) {
+        const isAdmin = await userService.isAdmin(req.body.operatorId)
+        if (!isAdmin)
+          return res.status(403).send({message: `Operator is Not Admin`})
+      }
+      updatedOrder = {...updatedOrder, operatorId: req.body.operatorId}
+    }
 
     const order = await orderService.updateOrder(updatedOrder)
     return res.json(order);

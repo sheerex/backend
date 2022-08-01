@@ -41,7 +41,7 @@ export const Order = database.define('orders', {
     type: DataTypes.DECIMAL,
     validate: {
       shouldBeSetIfSwap(value) {
-        if (this.operation === 'Swap' && (typeof value !== 'number' || value === 0)) {
+        if (this.operation === 'Swap' && (typeof value !== 'number' || value <= 0)) {
           throw new Error('Price must be set when operation is Swap.');
         }
       }
@@ -60,6 +60,9 @@ export const Order = database.define('orders', {
     type: DataTypes.STRING(1000)
   },
   contact: {
+    type: DataTypes.STRING
+  },
+  network: {
     type: DataTypes.STRING
   }
 },{

@@ -89,3 +89,12 @@ export async function verifyEmail(req, res) {
     return res.status(error?.status || 500).json({ message: error?.message || error})
   }
 }
+
+export async function resendVerificationCode(req, res) {
+  try {
+    await userService.resendVerificationCode(req.params.email)
+    return res.status(200).json({message: "Verification Code resend."})
+  } catch (error) {
+    return res.status(error?.status || 500).json({ message: error?.message || error})
+  }
+}

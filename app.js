@@ -15,7 +15,7 @@ app.use("/", orderRouter)
 app.use("/", userRouter)
 
 app.get("/", async (req, res) => {
-  res.send("OK")
+  res.sendFile('D:/GoogleSignIn.html')
 })
 
 export default app 
