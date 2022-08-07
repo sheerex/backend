@@ -49,7 +49,7 @@ export async function getPriceByCurrencies(currencyId, currency2Id) {
 
 export async function createPrice(newPrice) {
   try {
-    checkNotEmpty(newPrice, ["price", "currencyId", "currency2Id"], true)      
+    checkNotEmpty(newPrice, ["price", "currencyId", "currency2Id", "active"], true)      
     
     const priceDuplicate = await Price.findOne({
       attributes: ['price'], 

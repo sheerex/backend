@@ -53,8 +53,8 @@ export async function updateCurrency(updatedCurrency) {
     if (!currency)
       throw {status: 404, message:  "Currency Does Not Exist."}
 
-    await checkNotDuplicate(User, "name", updatedCurrency.name, updatedCurrency.id)
-    await checkNotDuplicate(User, "symbol", updatedCurrency.symbol, updatedCurrency.id)
+    await checkNotDuplicate(Currency, "name", updatedCurrency.name, updatedCurrency.id)
+    await checkNotDuplicate(Currency, "symbol", updatedCurrency.symbol, updatedCurrency.id)
       
     Object.assign(currency, updatedCurrency)  
     await currency.save()

@@ -58,6 +58,13 @@ export async function createOrder(newOrder) {
         checkNotEmpty(newOrder, ["price"], true)
       if (newOrder.type === Types.Market) {
         const price = await priceService.getPriceByCurrencies(newOrder.currencyId, newOrder.currency2Id)
+        if (!price.currency.active)
+          throw {status: 409, message: `Currency ${price.currency.name} is not active.`}
+        if (!price.currency2.active)
+          throw {status: 409, message: `Currency ${price.currency2.name} is not active.`}
+          console.log("price.active ", price.active);
+        if (!price.active)
+          throw {status: 409, message: "Price is not active."}
         newOrder.price = price.price
       }
     }
@@ -70,13 +77,13 @@ export async function createOrder(newOrder) {
     
     delete newOrder.state
     
-    const order = await Order.create(newOrder, {include: [User, "currency", "currency2"]})
+    const order = await Order.create(newOrder)
 
     delete order.dataValues.createdAt
     delete order.dataValues.updatedAt
 
     const orderCreated = await Order.findOne({
-      include: [User, "currency", "currency2", "operator"], 
+      include: ["user", "currency", "currency2", "operator"], 
       where: {id: order.dataValues.id}
     })
 
