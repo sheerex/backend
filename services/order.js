@@ -11,7 +11,7 @@ export async function getOrders(queryObject) {
     try {
       const { filterObject, sortingArray, limit, offset } = parseQueryParams(queryObject)
       const orders = await Order.findAll({
-        include: [User, "currency", "currency2", "operator"], 
+        include: ["user", "currency", "currency2", "operator"], 
         where: filterObject, 
         order: sortingArray,
         ...limit, 
@@ -72,6 +72,9 @@ export async function createOrder(newOrder) {
     
     const order = await Order.create(newOrder, {include: [User, "currency", "currency2"]})
 
+    delete order.dataValues.createdAt
+    delete order.dataValues.updatedAt
+
     const orderCreated = await Order.findOne({
       include: [User, "currency", "currency2", "operator"], 
       where: {id: order.dataValues.id}
@@ -81,9 +84,10 @@ export async function createOrder(newOrder) {
                     orderCreated.dataValues.user.email : 
                     orderCreated.dataValues.email
 
-    sendEmail(
-      email, 
-      "Sheerex: Order Registered", 
+    if (process.env?.TEST !== "SI")
+      sendEmail(
+        email, 
+        "Sheerex: Order Registered", 
       `Order: ${orderCreated.dataValues.id}
        Operation: ${orderCreated.dataValues.operation} ${orderCreated.dataValues.type ? "Type: " + orderCreated.dataValues.type : ""}
        Amount: ${orderCreated.dataValues.amount}

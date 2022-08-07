@@ -3,14 +3,22 @@ import * as dotenv from 'dotenv'
 
 dotenv.config()
 
-const ssl = process.env.DB_SSL === "SI" ? {ssl: {require: true, rejectUnauthorized: false}} : {}
+const DB_SSL  = process.env?.TEST === "SI" ? process.env.TESTDB_SSL  : process.env.DB_SSL
+const DB_NAME = process.env?.TEST === "SI" ? process.env.TESTDB_NAME : process.env.DB_NAME
+const DB_USER = process.env?.TEST === "SI" ? process.env.TESTDB_USER : process.env.DB_USER
+const DB_PASS = process.env?.TEST === "SI" ? process.env.TESTDB_PASS : process.env.DB_PASS
+const DB_HOST = process.env?.TEST === "SI" ? process.env.TESTDB_HOST : process.env.DB_HOST
+
+const ssl = DB_SSL === "SI" ? {ssl: {require: true, rejectUnauthorized: false}} : {}
+
+console.log("Connecting to DB:", DB_NAME)
 
 export const database = new Sequelize(
-  process.env.DB_NAME, 
-  process.env.DB_USER, 
-  process.env.DB_PASS, 
+  DB_NAME, 
+  DB_USER, 
+  DB_PASS, 
   {
-    host:  process.env.DB_HOST, 
+    host:  DB_HOST, 
     dialect: 'postgres',
     dialectOptions: ssl
   }

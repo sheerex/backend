@@ -60,6 +60,10 @@ export async function createPrice(newPrice) {
     }
       
     const price = await Price.create(newPrice, {include: ["currency", "currency2"]})
+
+    delete price.dataValues.createdAt
+    delete price.dataValues.updatedAt
+
     return price
 
   } catch (error) {

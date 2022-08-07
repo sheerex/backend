@@ -7,6 +7,7 @@ const router = Router()
 router.get("/users", checkUser, checkAdmin, userController.getUsers)
 router.get("/users/:id", checkUser, userController.getUser)
 router.get("/users/:id/balances", checkUser, userController.getUser)
+router.get("/users/:id/orders", checkUser, userController.getUser)
 
 
 router.post("/users", userController.createUser)

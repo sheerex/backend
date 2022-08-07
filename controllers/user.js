@@ -16,7 +16,7 @@ export async function getUser(req, res) {
     req.params.id = parseInt(req.params.id)
     await checkUserAccess(req.params.id, req.user.id, "User is not Admin and can only get its own profile.")
     
-    const user = await userService.getUser(req.params.id, req.url.includes("balances"), req.query)
+    const user = await userService.getUser(req.params.id, req.url.includes("balances"), req.url.includes("orders"), req.query)
     return res.json(user)
   } catch (error) {
     return res.status(error?.status || 500).json({ message: error?.message || error})

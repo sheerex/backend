@@ -23,6 +23,8 @@ export async function getOrder(req, res) {
 
     await checkUserAccess(order.userId, req.user.id, "User is not Admin and can only Get his own orders.")
 
+    console.log(typeof order.date, order.date, order.date.toLocaleString(), typeof order.date.toLocaleString());
+
     return res.json(order)
   } catch (error) {
     return res.status(error?.status || 500).json({ message: error?.message || error})

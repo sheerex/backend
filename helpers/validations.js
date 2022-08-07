@@ -21,7 +21,7 @@ export async function checkNotDuplicate(model, field, value, id) {
 export function checkNotEmpty(object, arrFields, required) {
   try {
     for (const field of arrFields) {
-      if (required && !object.hasOwnProperty(field))
+      if (required && (!object.hasOwnProperty(field) || !object[field]))
         throw {status: 422, message: `${field} is required.`}
       if (!required && object.hasOwnProperty(field) && !object[field])
         throw {status: 422, message: `${field} is required.`}

@@ -33,6 +33,10 @@ export async function createCurrency(newCurrency) {
     await checkNotDuplicate(Currency, "symbol", newCurrency.symbol)
 
     const currency = await Currency.create(newCurrency)
+
+    delete currency.dataValues.createdAt
+    delete currency.dataValues.updatedAt
+    
     return currency
 
   } catch (error) {
@@ -45,7 +49,7 @@ export async function updateCurrency(updatedCurrency) {
     checkNotEmpty(updatedCurrency, ["id"], true)
     checkNotEmpty(updatedCurrency, ["name", "symbol"], false)
 
-    const currency = await Currency.findByPk(id)
+    const currency = await Currency.findByPk(updatedCurrency.id)
     if (!currency)
       throw {status: 404, message:  "Currency Does Not Exist."}
 

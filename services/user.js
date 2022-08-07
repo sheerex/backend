@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
-import { Balance, Currency, User } from "../models/index.js"
+import { Balance, Currency, Order, User } from "../models/index.js"
 import { parseQueryParams } from "../helpers/queryParams.js"
 import { sendEmail } from "../helpers/sendEmail.js"
 import { checkNotDuplicate, checkNotEmpty } from "../helpers/validations.js"
@@ -21,10 +21,13 @@ export async function getUsers(queryObject) {
   }  
 }
 
-export async function getUser(id, includeBalance, queryObject) {
+export async function getUser(id, includeBalance, includeOrders, queryObject) {
   try {
-    const { filterObject, sortingArray } = parseQueryParams(queryObject)
-    const include = includeBalance ? {include: [{model: Balance, include: [Currency]}]} : {}
+    const { filterObject, sortingArray, limit, offset } = parseQueryParams(queryObject)
+    const includeBalanceArray = includeBalance ? [{model: Balance, include: [Currency], ...limit, ...offset}] : []
+    const includeOrdersArray = includeOrders ? [{model: Order, as: "orders", include: [ "currency", "currency2", "operator"], ...limit, ...offset}] : []
+    const include = {include: [...includeBalanceArray, ...includeOrdersArray]}
+
     const user = await User.findOne({
       ...include, 
       where: {id: id, ...filterObject}, 
@@ -59,16 +62,19 @@ export async function createUser(newUser) {
       verificationCode
     })
 
-    sendEmail(
-      user.email, 
-      "Sheerex: Verify your Email", 
-      `In order to operate as a registered user in our platform, 
+    if (process.env?.TEST !== "SI")
+      sendEmail(
+        user.email, 
+        "Sheerex: Verify your Email", 
+        `In order to operate as a registered user in our platform, 
 please verify your email entering the following verification code: 
 ${verificationCode}`)
 
     delete user.dataValues.password
     delete user.dataValues.verificationCode
-
+    delete user.dataValues.createdAt
+    delete user.dataValues.updatedAt
+    
     return user
   } catch (error) {
     throw {status: error?.status || 500, message: error.message}
