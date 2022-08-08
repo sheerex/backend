@@ -224,6 +224,51 @@ export async function resendVerificationCode(email) {
   }
 }
 
+export async function sendResetPassword(email) {
+  try {
+    if (!email)
+      throw {status: 422, message: "Email is required"}     
+    const user = await User.findOne({where: {email: email}})
+    if (!user)
+      throw {status: 404, message:  "User Does Not Exist."}
+    const token = jwt.sign(
+      { id: user.id, command: "ResetPassword" },
+      process.env.TOKEN_KEY,
+      {
+        expiresIn: "10m",
+      }
+    )
+    return { token }      
+  } catch (error) {
+    throw {status: error?.status || 500, message: error.message}
+  }
+}
+
+export async function resetPassword(token) {
+  if (!token)
+    throw {status: 422, message: "A token is required"}
+  try {
+    const decoded = jwt.verify(token, process.env.TOKEN_KEY)
+    if (decoded.command !== "ResetPassword")
+      throw {status: 400, message: "Invalid Token"}
+    const user = await User.findByPk(decoded.id)
+    if (!user)
+      throw {status: 404, message:  "User Does Not Exist."}
+    const password = Math.floor(100000 + Math.random() * 900000)
+    const encryptedPassword = await bcrypt.hash(password.toString(), 10)
+    user.password = encryptedPassword
+    await user.save()
+
+    sendEmail(
+      user.email, 
+      "Sheerex: Reset Password", 
+      `Your new password is: ${password}`)
+
+  } catch (error) {
+    throw {status: error?.status || 500, message: error.message}
+  }
+}
+
 export async function isAdmin(id) {
   try {
     const user = await User.findByPk(id)

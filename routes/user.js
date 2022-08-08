@@ -19,5 +19,7 @@ router.post("/users/login", userController.login)
 router.patch("/users/password/:id", checkUser, userController.changePassword)
 router.patch("/users/verified/:verificationCode", userController.verifyEmail)
 router.patch("/users/reverified/:email", userController.resendVerificationCode)
+router.patch("/users/generateresetpassword/:email", userController.sendResetPassword)
+router.patch("/users/resetpassword/:token", userController.resetPassword)
 
 export default router

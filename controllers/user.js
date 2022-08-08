@@ -98,3 +98,21 @@ export async function resendVerificationCode(req, res) {
     return res.status(error?.status || 500).json({ message: error?.message || error})
   }
 }
+
+export async function sendResetPassword(req, res) {
+  try {
+    const token = await userService.sendResetPassword(req.params.email)
+    return res.status(200).json(token)
+  } catch (error) {
+    return res.status(error?.status || 500).json({ message: error?.message || error})
+  }
+}
+
+export async function resetPassword(req, res) {
+  try {
+    await userService.resetPassword(req.params.token)
+    return res.status(200).json({message: "Password reseted."})
+  } catch (error) {
+    return res.status(error?.status || 500).json({ message: error?.message || error})
+  }
+}
