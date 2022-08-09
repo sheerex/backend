@@ -1,3 +1,5 @@
+import { Op } from "sequelize"
+
 export function parseQueryParams(queryObject) {
   try {
 
@@ -23,7 +25,31 @@ export function parseQueryParams(queryObject) {
     if (queryObject?.page) 
         delete queryObject["page"]
 
-    const filterObject = queryObject
+    let filterObject = {}
+    for (let field in queryObject) {    
+      const parseField = queryObject[field].split(":")
+      if (parseField.length > 1) {
+        let operator
+        if (parseField[1] === ">")
+          operator = Op.gt
+        if (parseField[1] === "<")
+          operator = Op.lt
+        if (parseField[1] === ">=")
+          operator = Op.gte
+        if (parseField[1] === "<=")
+          operator = Op.lte
+        if (parseField[1] === "!=")
+          operator = Op.ne
+        
+        if (!operator)
+          filterObject = {...filterObject, [field]: parseField[0]}
+        else
+          filterObject = {...filterObject, [field]: {[operator]: parseField[0]}}
+      } else {
+        filterObject = {...filterObject, [field]: queryObject[field]}
+      }
+    }
+
     return { filterObject, sortingArray, limit, offset }
   } catch(error) {
     throw {status: 500, message: error.message}

@@ -25,12 +25,20 @@ export async function getUser(id, includeBalance, includeOrders, queryObject) {
   try {
     const { filterObject, sortingArray, limit, offset } = parseQueryParams(queryObject)
     const includeBalanceArray = includeBalance ? [{model: Balance, include: [Currency], ...limit, ...offset}] : []
-    const includeOrdersArray = includeOrders ? [{model: Order, as: "orders", include: [ "currency", "currency2", "operator"], ...limit, ...offset}] : []
+    const includeOrdersArray = includeOrders ? [{
+      model: Order, 
+      as: "orders", 
+      include: [ "currency", "currency2", "operator"], 
+      where: {...filterObject}, 
+      required: false,
+      ...limit, 
+      ...offset
+    }] : []
     const include = {include: [...includeBalanceArray, ...includeOrdersArray]}
 
     const user = await User.findOne({
       ...include, 
-      where: {id: id, ...filterObject}, 
+      where: {id: id}, 
       order: sortingArray
     })
     if (!user)
