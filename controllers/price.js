@@ -22,7 +22,7 @@ export async function getPrice(req, res) {
 export async function getPriceByCurrencies(req, res) {
   try {
     req.params.id = parseInt(req.params.id)
-    req.params.id = parseInt(req.params.id2)
+    req.params.id2 = parseInt(req.params.id2)
     const price = await priceService.getPriceByCurrencies(req.params.id, req.params.id2)
     return res.json(price)
   } catch (error) {
