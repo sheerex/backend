@@ -4,8 +4,8 @@ import { checkAdmin, checkUser } from "../middleware/auth.js"
 
 const router = Router()
 
-router.get("/currencies", checkUser, checkAdmin, currencyController.getCurrencies)
-router.get("/currencies/:id", checkUser, checkAdmin, currencyController.getCurrency)
+router.get("/currencies", currencyController.getCurrencies)
+router.get("/currencies/:id", currencyController.getCurrency)
 router.post("/currencies", checkUser, checkAdmin, currencyController.createCurrency)
 router.patch("/currencies/:id", checkUser, checkAdmin, currencyController.updateCurrency)
 //router.delete("/currencies/:id", checkUser, checkAdmin, currencyController.deleteCurrency)
