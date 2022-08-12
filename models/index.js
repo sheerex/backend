@@ -1,5 +1,6 @@
 import { Balance } from "./balance.js"
 import { Currency } from "./currency.js"
+import { Network } from "./network.js"
 import { Order } from "./order.js"
 import { Parameter } from "./parameter.js"
 import { Price } from "./price.js"
@@ -25,14 +26,17 @@ Currency.hasMany(Order, { foreignKey: {allowNull: false }})
 Currency.hasMany(Order, { foreignKey: {name: 'currency2Id' }})
 User.hasMany(Order, {as: "orders", foreignKey: {name: 'userId' }})
 User.hasMany(Order, {as: "ordersOperated", foreignKey: {name: 'operatorId' }})
+Network.hasMany(Order)
 Order.belongsTo(Currency, { as: "currency"})
 Order.belongsTo(Currency, { as: "currency2", foreignKey: {name: 'currency2Id'}})
 Order.belongsTo(User, {as: "user", foreignKey: {name: 'userId' }})
 Order.belongsTo(User, {as: "operator", foreignKey: {name: 'operatorId' }})
+Order.belongsTo(Network)
 
 export {
   Balance,
   Currency,
+  Network,
   Order,
   Parameter,
   Price,

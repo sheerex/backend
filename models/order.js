@@ -65,9 +65,6 @@ export const Order = database.define('orders', {
   email: {
     type: DataTypes.STRING,
     validate: {isEmail: true}
-  },
-  network: {
-    type: DataTypes.STRING
   }
 },{
   defaultScope: {

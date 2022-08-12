@@ -1,4 +1,4 @@
-import { Order, User } from "../models/index.js"
+import { Network, Order, User } from "../models/index.js"
 import { parseQueryParams } from "../helpers/queryParams.js"
 import { sendEmail } from "../helpers/sendEmail.js"
 import { checkNotDuplicate, checkNotEmpty } from "../helpers/validations.js"
@@ -11,7 +11,7 @@ export async function getOrders(queryObject) {
     try {
       const { filterObject, sortingArray, limit, offset } = parseQueryParams(queryObject)
       const orders = await Order.findAll({
-        include: ["user", "currency", "currency2", "operator"], 
+        include: ["user", "currency", "currency2", "operator", Network], 
         where: filterObject, 
         order: sortingArray,
         ...limit, 
@@ -27,7 +27,7 @@ export async function getOrder(id, queryObject) {
   try {
     const { filterObject, sortingArray } = parseQueryParams(queryObject)
     const order = await Order.findOne({
-      include: [User, "currency", "currency2", "operator"], 
+      include: ["user", "currency", "currency2", "operator", Network], 
       where: {id: id, ...filterObject}, 
       order: sortingArray
     })
@@ -53,7 +53,7 @@ export async function createOrder(newOrder) {
     }
 
     if (newOrder.operation === Operations.Swap) {
-      checkNotEmpty(newOrder, ["type", "currency2Id"], true)
+      checkNotEmpty(newOrder, ["type", "currency2Id", "networkId"], true)
       if (newOrder.type === Types.Limit)
         checkNotEmpty(newOrder, ["price"], true)
       if (newOrder.type === Types.Market) {
@@ -83,7 +83,7 @@ export async function createOrder(newOrder) {
     delete order.dataValues.updatedAt
 
     const orderCreated = await Order.findOne({
-      include: ["user", "currency", "currency2", "operator"], 
+      include: ["user", "currency", "currency2", "operator", "network"], 
       where: {id: order.dataValues.id}
     })
 
