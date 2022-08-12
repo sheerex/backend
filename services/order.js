@@ -3,6 +3,7 @@ import { parseQueryParams } from "../helpers/queryParams.js"
 import { sendEmail } from "../helpers/sendEmail.js"
 import { checkNotDuplicate, checkNotEmpty } from "../helpers/validations.js"
 import { Operations, States, Types } from "../models/enum.js";
+import * as networkService from "../services/network.js"
 import * as priceService from "../services/price.js"
 import * as userService from "../services/user.js"
 
@@ -56,13 +57,15 @@ export async function createOrder(newOrder) {
       checkNotEmpty(newOrder, ["type", "currency2Id", "networkId"], true)
       if (newOrder.type === Types.Limit)
         checkNotEmpty(newOrder, ["price"], true)
+      const network = await networkService.getNetwork(newOrder.networkId)
+      if (!network.active)
+        throw {status: 409, message: "Network is not active."}
       if (newOrder.type === Types.Market) {
         const price = await priceService.getPriceByCurrencies(newOrder.currencyId, newOrder.currency2Id)
         if (!price.currency.active)
           throw {status: 409, message: `Currency ${price.currency.name} is not active.`}
         if (!price.currency2.active)
           throw {status: 409, message: `Currency ${price.currency2.name} is not active.`}
-          console.log("price.active ", price.active);
         if (!price.active)
           throw {status: 409, message: "Price is not active."}
         newOrder.price = price.price
