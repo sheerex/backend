@@ -2,7 +2,7 @@ import chai from "chai"
 import fetch from 'node-fetch'
 import fs from 'fs'
 import { database } from "../database/database.js"
-import { Balance, Currency, Order, Parameter, Price, User } from "../models/index.js"
+import { Balance, Currency, Network, Order, Parameter, Price, User } from "../models/index.js"
 
 
 describe("GENERAL", () => {
@@ -171,7 +171,7 @@ describe("GENERAL", () => {
     chai.expect(await response.json()).to.deep.equal(expected) 
   })  
 
-   it("GET Users", async () => {
+   it("Should GET Users", async () => {
     const expected = [{
       "id": 1,
       "username": "admin",
@@ -195,4 +195,6 @@ describe("GENERAL", () => {
     chai.expect(response.status).to.equal(200)
     chai.expect(await response.json()).to.deep.equal(expected) 
    })
+
+
 })

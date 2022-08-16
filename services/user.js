@@ -172,14 +172,14 @@ export async function login(loginUser) {
 export async function changePassword(userPassword) {
   try {
     checkNotEmpty(userPassword, ["id", "newPassword", "oldPassword"], true)
-
-    const user = await User.findByPk(userPassword.id)
+    const user = await User.findByPk(userPassword.id, {attributes: ["id", "password"]})
     if (!user)
       throw {status: 404, message:  "User Does Not Exist."} 
-
+    
     if (!await bcrypt.compare(userPassword.oldPassword, user.password)) 
       throw {status: 401, message: "Invalid Credentials."}
-
+    
+    console.log("Service2");
     const encryptedPassword = await bcrypt.hash(userPassword.newPassword, 10)
     user.password = encryptedPassword
     await user.save()
