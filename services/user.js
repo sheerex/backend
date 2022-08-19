@@ -53,7 +53,7 @@ export async function createUser(newUser) {
   try {
 
     // VALIDATIONS
-    checkNotEmpty(newUser, ["username", "email", "password"], true)
+    checkNotEmpty(newUser, ["username", "email", "password", "telephone"], true)
     await checkNotDuplicate(User, "username", newUser.username)
     await checkNotDuplicate(User, "email", newUser.email)
     
@@ -92,7 +92,7 @@ ${verificationCode}`)
 export async function updateUser(updatedUser) {
   try {
     checkNotEmpty(updatedUser, ["id"], true)
-    checkNotEmpty(updatedUser, ["username", "email"], false)
+    checkNotEmpty(updatedUser, ["username", "email", "telephone"], false)
   
     const user = await User.findByPk(updatedUser.id)
     if (!user)
@@ -172,14 +172,17 @@ export async function login(loginUser) {
 export async function changePassword(userPassword) {
   try {
     checkNotEmpty(userPassword, ["id", "newPassword", "oldPassword"], true)
+
+    if (userPassword.newPassword === userPassword.oldPassword)
+      throw {status: 400, message: "New Password Must Be Different From Old Password."}
+
     const user = await User.findByPk(userPassword.id, {attributes: ["id", "password"]})
     if (!user)
       throw {status: 404, message:  "User Does Not Exist."} 
     
     if (!await bcrypt.compare(userPassword.oldPassword, user.password)) 
       throw {status: 401, message: "Invalid Credentials."}
-    
-    console.log("Service2");
+
     const encryptedPassword = await bcrypt.hash(userPassword.newPassword, 10)
     user.password = encryptedPassword
     await user.save()
@@ -246,7 +249,12 @@ export async function sendResetPassword(email) {
         expiresIn: "10m",
       }
     )
-    return { token }      
+    
+    sendEmail(
+      user.email, 
+      "Sheerex: Reset Password Confirmation", 
+      `To reset your password, visit the next link: 
+      www.sheerex.com/verificar/${token}`)   
   } catch (error) {
     throw {status: error?.status || 500, message: error.message}
   }

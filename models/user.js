@@ -50,6 +50,15 @@ export const User = database.define('users', {
   },
   verificationCode: {
     type: DataTypes.INTEGER
+  },
+  telephone: {
+    type: DataTypes.STRING,
+    validate: {
+      isNumeric: true
+    }    
+  },
+  category: {
+    type: DataTypes.STRING
   }
 },{
   defaultScope: {
