@@ -67,7 +67,9 @@ export async function createUser(newUser) {
       isAdmin: false,
       verified: false,  
       active: true,
-      verificationCode
+      verificationCode,
+      telephone: newUser.telephone,
+      category: newUser.category
     })
 
     if (process.env?.TEST !== "SI")

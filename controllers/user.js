@@ -38,7 +38,7 @@ export async function updateUser(req, res) {
     const isAdmin = await checkUserAccess(req.params.id, req.user.id, "User is not Admin and can only get its own profile.")
 
     if (!isAdmin) {
-      const listFieldsDefine = fieldsDefined(req, ["active","verified"])
+      const listFieldsDefine = fieldsDefined(req, ["active","verified", "noVerified"])
       if (listFieldsDefine)
         return res.status(403).send({message: `User is not Admin and can not update ${listFieldsDefine}.`})
     }

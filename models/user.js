@@ -59,6 +59,11 @@ export const User = database.define('users', {
   },
   category: {
     type: DataTypes.STRING
+  }, 
+  noVerified: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false
   }
 },{
   defaultScope: {
