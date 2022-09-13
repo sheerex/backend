@@ -10,16 +10,17 @@ describe("GENERAL", () => {
     await User.sync({ force: true})
     await Currency.sync({ force: true})
     await Balance.sync({ force: true})
-    await Price.sync({ force: true})
+    await Network.sync({ force: true})
     await Order.sync({ force: true})
     await Parameter.sync({ force: true})
+    await Price.sync({ force: true})
     
     const sql = fs.readFileSync('scripts/script.sql', 'utf8');
     await database.query(sql)  
     
     await database.query(
-      `insert into users ("username","email","password","isAdmin","depositLimit","verified","active","verificationCode","createdAt","updatedAt") 
-      values ('admin', 'admin@sheerex.com','admin', true, null, true, true, null, now(), now())`)
+      `insert into users ("username","email","password","isAdmin","depositLimit","verified","active","verificationCode","createdAt","updatedAt","category","telephone","noVerified") 
+      values ('admin', 'admin@sheerex.com','admin', true, null, true, true, null, now(), now(), 'Normal', '123456', false)`)
 
     process.env.TOKEN_EXPIRATION = "1h"  
   })
@@ -62,7 +63,10 @@ describe("GENERAL", () => {
       "isAdmin": true,
       "depositLimit": null,
       "verified": true,
-      "active": true
+      "active": true,
+      "category": "Normal",
+      "telephone": "123456",
+      "noVerified": false
     }
     const response = await fetch('http://localhost:5555/users/1', 
       {method: 'GET', headers: {"x-access-token": tokenAdmin}})
@@ -84,7 +88,8 @@ describe("GENERAL", () => {
     const newUser = {
         "username": "juan",
         "email": "juan@gmail.com",
-        "password": "123"
+        "password": "123",
+        "telephone": "123456"
     }
     const expected = {
       "id": 2,
@@ -93,7 +98,10 @@ describe("GENERAL", () => {
       "isAdmin": false,
       "verified": false,
       "active": true,
-      "depositLimit": null
+      "depositLimit": null,
+      "category": null,
+      "telephone": "123456",
+      "noVerified": false      
     }    
     const response = await fetch('http://localhost:5555/users', {
       method: 'POST', 
@@ -179,7 +187,10 @@ describe("GENERAL", () => {
       "isAdmin": true,
       "depositLimit": null,
       "verified": true,
-      "active": true
+      "active": true,
+      "category": "Normal",
+      "telephone": "123456",
+      "noVerified": false      
     },
     {
       "id": 2,
@@ -188,7 +199,10 @@ describe("GENERAL", () => {
       "isAdmin": false,
       "verified": false,
       "active": true,
-      "depositLimit": null
+      "depositLimit": null,
+      "category": null,
+      "telephone": "123456",
+      "noVerified": false      
     }]
     const response = await fetch('http://localhost:5555/users/', 
       {method: 'GET', headers: {"x-access-token": tokenAdmin}})
@@ -196,5 +210,56 @@ describe("GENERAL", () => {
     chai.expect(await response.json()).to.deep.equal(expected) 
    })
 
+   // CURRENCIES
+   it("Should POST Currency", async () => {
+    const newCurrency = {
+        "name": "Pesos",
+        "symbol": "ARS",
+        "active": true,
+        "url": "http:/url.com"
+    }
+    const expected = {
+      "id": 1,
+      "name": "Pesos",
+      "symbol": "ARS",
+      "active": true,
+      "url": "http:/url.com"
+  }    
+    const response = await fetch('http://localhost:5555/currencies', {
+      method: 'POST', 
+      body: JSON.stringify(newCurrency),
+      headers: {
+        "x-access-token": tokenAdmin,
+        "Content-Type": "application/json"
+      }
+    })
+    chai.expect(response.status).to.equal(201)
+    chai.expect(await response.json()).to.deep.equal(expected) 
+  })
 
+  it("Should PATCH Currency", async () => {
+    const updateCurrency = {
+        "name": "Pesoss",
+        "symbol": "ARSS",
+        "active": false,
+        "url": "http:/url2.com"
+    }
+    const expected = {
+      "id": 1,
+      "name": "Pesoss",
+      "symbol": "ARSS",
+      "active": false,
+      "url": "http:/url2.com"
+  }    
+    const response = await fetch('http://localhost:5555/currencies/1', {
+      method: 'PATCH', 
+      body: JSON.stringify(updateCurrency),
+      headers: {
+        "x-access-token": tokenAdmin,
+        "Content-Type": "application/json"
+      }
+    })
+    chai.expect(response.status).to.equal(200)
+    chai.expect(await response.json()).to.deep.equal(expected) 
+  })
 })

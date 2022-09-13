@@ -4,8 +4,8 @@ import { parseQueryParams } from "../helpers/queryParams.js"
 export async function getParameters(queryObject) {
   try {
     const { filterObject, sortingArray } = parseQueryParams(queryObject)
-    const currencies = await Parameter.findAll({where: filterObject, order: sortingArray})
-    return currencies
+    const parameters = await Parameter.findAll({where: filterObject, order: sortingArray})
+    return parameters
   } catch (error) {
     throw {status: 500, message: error.message}
   }  
@@ -23,8 +23,9 @@ export async function updateParameter(updatedParameter) {
 
     if (!value)
       throw {status: 422, message: "Value is required."}
-     
+    console.log(value) 
     parameter.value = value
+//    parameter.value = "a\nb"
     await parameter.save()
 
     return parameter

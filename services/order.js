@@ -1,12 +1,11 @@
 import { Network, Order, User } from "../models/index.js"
 import { parseQueryParams } from "../helpers/queryParams.js"
 import { sendEmail } from "../helpers/sendEmail.js"
-import { checkNotDuplicate, checkNotEmpty } from "../helpers/validations.js"
+import { checkNotEmpty } from "../helpers/validations.js"
 import { Operations, States, Types } from "../models/enum.js";
 import * as networkService from "../services/network.js"
 import * as priceService from "../services/price.js"
-import * as userService from "../services/user.js"
-
+import * as parameterService from "../services/parameter.js"
 
 export async function getOrders(queryObject) {
     try {
@@ -90,20 +89,26 @@ export async function createOrder(newOrder) {
       where: {id: order.dataValues.id}
     })
 
-    const email = orderCreated.dataValues.user?.email ? 
-                    orderCreated.dataValues.user.email : 
-                    orderCreated.dataValues.email
+    if (process.env?.TEST !== "SI") {
+      const email = orderCreated.dataValues.user?.email ? 
+      orderCreated.dataValues.user.email : 
+      orderCreated.dataValues.email
 
-    if (process.env?.TEST !== "SI")
+      const payment = await parameterService.getParameters({id: "1"})
+      const paymentInfo = payment[0].toJSON().value
+      console.log(paymentInfo);
+      
       sendEmail(
         email, 
         "Sheerex: Order Registered", 
-      `Order: ${orderCreated.dataValues.id}
-       Operation: ${orderCreated.dataValues.operation} ${orderCreated.dataValues.type ? "Type: " + orderCreated.dataValues.type : ""}
-       Amount: ${orderCreated.dataValues.amount}
-       Currency: ${orderCreated.dataValues.currency.name}
-       ${orderCreated.dataValues.currency2?.name ? "Currency To: " + orderCreated.dataValues.currency2.name : ""}
-      `)
+        `Order: ${orderCreated.dataValues.id}
+Operation: ${orderCreated.dataValues.operation} ${orderCreated.dataValues.type ? "Type: " + orderCreated.dataValues.type : ""}
+Amount: ${orderCreated.dataValues.amount}
+Currency: ${orderCreated.dataValues.currency.name}
+${orderCreated.dataValues.currency2?.name ? "Currency To: " + orderCreated.dataValues.currency2.name : ""}
+${paymentInfo}
+        `)
+      }
 
     return orderCreated
   } catch (error) {

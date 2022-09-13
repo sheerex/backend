@@ -2,6 +2,7 @@ import * as parameterService from "../services/parameter.js"
 
 export async function getParameters(req, res) {
   try {
+    console.log(req.query)
     const result = await parameterService.getParameters(req.query)
     return res.json(result)
   } catch (error) {
