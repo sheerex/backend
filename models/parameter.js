@@ -13,7 +13,7 @@ export const Parameter = database.define('parameters', {
     allowNull: false
   },
   value: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(5000),
     allowNull: false
   },
   type: {
