@@ -12,8 +12,8 @@ dotenv.config()
 
 const app = express()
 
-const cors =  process.env?.CORS ? process.env?.CORS : '*'
-app.use(cors({origin: cors}))
+const CORSSettings =  process.env?.CORS ? process.env?.CORS : '*'
+app.use(cors({origin: CORSSettings}))
 app.use(express.json())
 app.use("/", currencyRouter)
 app.use("/", networkRouter)
