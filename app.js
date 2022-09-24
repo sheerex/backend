@@ -6,10 +6,14 @@ import parameterRouter from "./routes/parameter.js"
 import priceRouter from "./routes/price.js"
 import orderRouter from "./routes/order.js"
 import userRouter from "./routes/user.js"
+import * as dotenv from 'dotenv'
+
+dotenv.config()
 
 const app = express()
 
-app.use(cors({origin: "*"}))
+const cors =  process.env?.CORS ? process.env?.CORS : '*'
+app.use(cors({origin: cors}))
 app.use(express.json())
 app.use("/", currencyRouter)
 app.use("/", networkRouter)
