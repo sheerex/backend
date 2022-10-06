@@ -256,7 +256,7 @@ export async function sendResetPassword(email) {
       user.email, 
       "Sheerex: Reset Password Confirmation", 
       `To reset your password, visit the next link: 
-      www.sheerex.com/verificar/${token}`)   
+      www.sheerex.io/verificar/${token}`)   
   } catch (error) {
     throw {status: error?.status || 500, message: error.message}
   }
