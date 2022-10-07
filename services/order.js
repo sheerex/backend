@@ -100,12 +100,12 @@ export async function createOrder(newOrder) {
       
       sendEmail(
         email, 
-        "Sheerex: Order Registered", 
-        `Order: ${orderCreated.dataValues.id}
-Operation: ${orderCreated.dataValues.operation} ${orderCreated.dataValues.type ? "Type: " + orderCreated.dataValues.type : ""}
-Amount: ${orderCreated.dataValues.amount}
-Currency: ${orderCreated.dataValues.currency.name}
-${orderCreated.dataValues.currency2?.name ? "Currency To: " + orderCreated.dataValues.currency2.name : ""}
+        "Sheerex: Orden Registrada", 
+        `Orden: ${orderCreated.dataValues.id}
+Operación: ${orderCreated.dataValues.operation} ${orderCreated.dataValues.type ? "Tipo: " + orderCreated.dataValues.type : ""}
+Monto: ${orderCreated.dataValues.amount}
+Moneda Origen: ${orderCreated.dataValues.currency.name}
+${orderCreated.dataValues.currency2?.name ? "Moneda Destino: " + orderCreated.dataValues.currency2.name : ""}
 ${paymentInfo}
         `)
       }

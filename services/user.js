@@ -75,9 +75,9 @@ export async function createUser(newUser) {
     if (process.env?.TEST !== "SI")
       sendEmail(
         user.email, 
-        "Sheerex: Verify your Email", 
-        `In order to operate as a registered user in our platform, 
-please verify your email entering the following verification code: 
+        "Sheerex: Verifique su Email", 
+        `Para poder operar como un usuario registrado en nuestra plataforma, 
+por favor verifique su email ingresando el siguiente código de verificación: 
 ${verificationCode}`)
 
     delete user.dataValues.password
@@ -227,10 +227,10 @@ export async function resendVerificationCode(email) {
 
   sendEmail(
     user.email, 
-    "Sheerex: Verify your Email", 
-    `In order to operate as a registered user in our platform, 
-    please verify your email entering the following verification code: 
-    ${verificationCode}`)
+    "Sheerex: Verifique su Email", 
+    `Para poder operar como un usuario registrado en nuestra plataforma, 
+por favor verifique su email ingresando el siguiente código de verificación: 
+${verificationCode}`)
 
   } catch (error) {
     throw {status: error?.status || 500, message: error.message}
@@ -254,8 +254,8 @@ export async function sendResetPassword(email) {
     
     sendEmail(
       user.email, 
-      "Sheerex: Reset Password Confirmation", 
-      `To reset your password, visit the next link: 
+      "Sheerex: Confirmación de Reseteo de Contraseña", 
+      `Para resetear su contraseña, visite el siguiente enlance: 
       www.sheerex.io/verificar/${token}`)   
   } catch (error) {
     throw {status: error?.status || 500, message: error.message}
@@ -279,8 +279,8 @@ export async function resetPassword(token) {
 
     sendEmail(
       user.email, 
-      "Sheerex: Reset Password", 
-      `Your new password is: ${password}`)
+      "Sheerex: Contraseña Reseteada", 
+      `Su nueva contraseña es: ${password}`)
 
   } catch (error) {
     throw {status: error?.status || 500, message: error.message}
