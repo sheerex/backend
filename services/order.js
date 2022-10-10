@@ -104,6 +104,7 @@ export async function createOrder(newOrder) {
         `Orden: ${orderCreated.dataValues.id}
 Operación: ${orderCreated.dataValues.operation} ${orderCreated.dataValues.type ? "Tipo: " + orderCreated.dataValues.type : ""}
 Monto: ${orderCreated.dataValues.amount}
+Precio de Intercambio: ${orderCreated.price}
 Moneda Origen: ${orderCreated.dataValues.currency.name}
 ${orderCreated.dataValues.currency2?.name ? "Moneda Destino: " + orderCreated.dataValues.currency2.name : ""}
 ${paymentInfo}
